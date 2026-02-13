@@ -291,7 +291,7 @@ function CoupaForm() {
         venacc: data.vendor_detail.ven_acc ? data.vendor_detail.ven_acc : "",
         ventype: data.vendor_detail.ven_type ? data.vendor_detail.ven_type.toUpperCase() : "",
         currency: data.vendor_detail.lim_curr ? data.vendor_detail.lim_curr : "",
-        description: data.vendor_detail.description ? data.vendor_detail.description : "",
+        description: data.vendor_detail.ven_description ? data.vendor_detail.ven_description : "",
         is_tender: data.vendor_detail.is_tender ? data.vendor_detail.is_tender : false,
         is_priority: data.vendor_detail.is_priority ? data.vendor_detail.is_priority : false,
         is_interest: data.vendor_detail.is_interest ? data.vendor_detail.is_interest : false,
