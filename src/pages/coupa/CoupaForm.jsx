@@ -466,7 +466,6 @@ function CoupaForm() {
   });
   useMemo(() => ({ cities, countries, currencies }), [cities, countries, currencies]);
 
-
   useEffect(() => {
     const controller = new AbortController();
     const dynaCity = async () => {
@@ -679,12 +678,30 @@ function CoupaForm() {
       setLoading(true);
       let submit;
 
-      submit = await axiosPrivate.post(`/coupa/vendor/submit`, jsonSend);
-      const response = submit.data;
-      console.log(response);
-      if (response) {
-        await axiosPrivate.post("/coupa/vendor/update", { id: data_form.id });
+      // submit = await axiosPrivate.post(`/coupa/vendor/submit`, jsonSend);
+      // const response = submit.data;
+
+      // Cek apakah selected company adalah upstream
+      const isUpstream =
+        comps.current["UPSTREAM"]?.some(item => item.comp_id === value.company) ?? false;
+
+      console.log(`upstream bro? `, isUpstream);
+      console.log(`payload? `, jsonSend);
+
+      if (!isUpstream) {
+        alert("Not Upstream");
       }
+      
+      if (
+        (ven_detail.is_interest || ven_detail.is_priority || ven_detail.is_tender) &&
+        isUpstream
+      ) {
+        await axiosPrivate.post("/coupa/vendor/emailCfo", jsonSend);
+      }
+      // console.log(response);
+      // if (response) {
+      //   await axiosPrivate.post("/coupa/vendor/update", { id: data_form.id });
+      // }
       setFormStat({ stat: true, type: "success", message: response.message });
       if (!is_draft.current) {
         setTimeout(() => {
@@ -1194,10 +1211,13 @@ function CoupaForm() {
                       disabled={true}
                       rules={{
                         // required: chgLocal === "OVS" ? false : t("Please insert this field"),
-                        maxLength: chgLocal === "OVS" ? false :{
-                            value: 5,
-                            message: "Max 5 Character for Indonesia Postal Code",
-                          },
+                        maxLength:
+                          chgLocal === "OVS"
+                            ? false
+                            : {
+                                value: 5,
+                                message: "Max 5 Character for Indonesia Postal Code",
+                              },
                       }}
                       format="################"
                       isNumString={false}
@@ -1270,7 +1290,6 @@ function CoupaForm() {
                             value: 35,
                             message: "Max 35 Character, continue to field below if not enough",
                           },
-
                         }}
                         toUpperCase={true}
                       />
@@ -1336,10 +1355,13 @@ function CoupaForm() {
                       disabled={true}
                       rules={{
                         // required: chgLocal === "OVS" ? false : "Please insert this field",
-                        maxLength: chgLocal === "OVS" ? false :{
-                            value: 5,
-                            message: "Max 5 Character for Indonesia Postal Code",
-                          },
+                        maxLength:
+                          chgLocal === "OVS"
+                            ? false
+                            : {
+                                value: 5,
+                                message: "Max 5 Character for Indonesia Postal Code",
+                              },
                       }}
                       format="################"
                       isNumString={false}
@@ -1477,10 +1499,13 @@ function CoupaForm() {
                       disabled={true}
                       rules={{
                         // required: chgLocal === "OVS" ? false : "Please insert this field",
-                        maxLength: chgLocal === "OVS" ? false :{
-                            value: 5,
-                            message: "Max 5 Character for Indonesia Postal Code",
-                          },
+                        maxLength:
+                          chgLocal === "OVS"
+                            ? false
+                            : {
+                                value: 5,
+                                message: "Max 5 Character for Indonesia Postal Code",
+                              },
                       }}
                       format="################"
                       isNumString={false}
@@ -1898,29 +1923,29 @@ function CoupaForm() {
               )}
             </Box>
             <Box>
-                <Button
-                  sx={{ height: 50, width: 100, margin: 2 }}
-                  variant="contained"
-                  type="submit"
-                  onClick={() => {
-                    // console.log(testSubmitForm());
-                    handleSubmit(value => {
-                      is_draft.current = false;
-                      if (
-                        (isTender || value.is_priority || value.is_interest) &&
-                        emp_role_id == "STAFF" &&
-                        isValid
-                      ) {
-                        setConfOpen(true);
-                      } else {
-                        submitForm(value);
-                      }
-                    })();
-                  }}
-                  disabled={btnClicked}
-                >
-                  {t("Submit")}
-                </Button>
+              <Button
+                sx={{ height: 50, width: 100, margin: 2 }}
+                variant="contained"
+                type="submit"
+                onClick={() => {
+                  // console.log(testSubmitForm());
+                  handleSubmit(value => {
+                    is_draft.current = false;
+                    if (
+                      (isTender || value.is_priority || value.is_interest) &&
+                      emp_role_id == "STAFF" &&
+                      isValid
+                    ) {
+                      setConfOpen(true);
+                    } else {
+                      submitForm(value);
+                    }
+                  })();
+                }}
+                disabled={btnClicked}
+              >
+                {t("Submit")}
+              </Button>
             </Box>
           </Box>
         </Container>
@@ -1940,12 +1965,7 @@ function CoupaForm() {
             {`${t("Ticket Number")} ${loader_data.ticket_num} ${t("has already submitted")}`}
           </Alert>
         </Snackbar>
-        <Backdrop
-          sx={{ color: "#fff", zIndex: theme => theme.zIndex.drawer + 1 }}
-          open={
-            loading
-          }
-        >
+        <Backdrop sx={{ color: "#fff", zIndex: theme => theme.zIndex.drawer + 1 }} open={loading}>
           <CircularProgress color="inherit" disableShrink />
         </Backdrop>
       </Container>
