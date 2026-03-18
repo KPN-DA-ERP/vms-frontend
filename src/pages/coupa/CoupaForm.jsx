@@ -173,7 +173,7 @@ function CoupaForm() {
   const checkFieldRule = useCallback(
     field_name => {
       let is_exist = true;
-      if (field_rule.fields[0] == "all" || emp_role_id == "ADMIN") {
+      if (field_rule.fields[0] == "all" || emp_role_id == "ADMIN" || emp_role_id == "MDM") {
         is_exist = true;
       } else if (field_name == "vendetail" && data_form.emp_role_id !== "VENDOR") {
         if (field_rule.condition == "disabled") {
@@ -186,7 +186,7 @@ function CoupaForm() {
       } else {
         is_exist = field_rule.fields.includes(field_name);
       }
-      if (field_rule.condition == "enabled" || emp_role_id == "ADMIN") {
+      if (field_rule.condition == "enabled" || emp_role_id == "ADMIN" || emp_role_id == "MDM") {
         return !is_exist;
       } else {
         return is_exist;
@@ -321,6 +321,7 @@ function CoupaForm() {
               bank_curr: bank.bank_curr ? { value: bank.bank_curr, label: bank.bank_curr } : null,
 
               bank_acc: bank.bank_acc ?? "",
+              acc_name: bank.bank_name ?? "",
               acc_hold: bank.acc_hold ?? "",
             }))
           : [],
@@ -678,20 +679,15 @@ function CoupaForm() {
       setLoading(true);
       let submit;
 
-      // submit = await axiosPrivate.post(`/coupa/vendor/submit`, jsonSend);
-      // const response = submit.data;
+      submit = await axiosPrivate.post(`/coupa/vendor/submit`, jsonSend);
+      const response = submit.data;
 
-      // Cek apakah selected company adalah upstream
       const isUpstream =
         comps.current["UPSTREAM"]?.some(item => item.comp_id === value.company) ?? false;
 
-      console.log(`upstream bro? `, isUpstream);
-      console.log(`payload? `, jsonSend);
+      // console.log(`upstream bro? `, isUpstream);
+      // console.log(`payload? `, jsonSend);
 
-      if (!isUpstream) {
-        alert("Not Upstream");
-      }
-      
       if (
         (ven_detail.is_interest || ven_detail.is_priority || ven_detail.is_tender) &&
         isUpstream
@@ -699,9 +695,9 @@ function CoupaForm() {
         await axiosPrivate.post("/coupa/vendor/emailCfo", jsonSend);
       }
       // console.log(response);
-      // if (response) {
-      //   await axiosPrivate.post("/coupa/vendor/update", { id: data_form.id });
-      // }
+      if (response) {
+        await axiosPrivate.post("/coupa/vendor/update", { id: data_form.id });
+      }
       setFormStat({ stat: true, type: "success", message: response.message });
       if (!is_draft.current) {
         setTimeout(() => {
