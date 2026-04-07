@@ -319,6 +319,7 @@ function CoupaForm() {
               bank_curr: bank.bank_curr ? { value: bank.bank_curr, label: bank.bank_curr } : null,
 
               bank_acc: bank.bank_acc ?? "",
+              acc_name: bank.bank_name ?? "",
               acc_hold: bank.acc_hold ?? "",
             }))
           : [],
