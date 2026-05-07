@@ -177,34 +177,6 @@ function DetailVendor({ t = s => s }) {
   }, [id]);
 
   useEffect(() => {
-    const controller = new AbortController();
-
-    const fetchVendor = async () => {
-      setLoading(true);
-      try {
-        const res = await axiosPrivate.get(`/master/banksap?country=${bank.id}`, {
-          signal: controller.signal,
-        });
-        const data = res?.data?.data?.[0];
-        const response = bdata.data;
-        const result = response.data;
-        const databank = result?.map(item => ({
-          value: item.id,
-          label: `${item.bank_name} (${item.bank_code}) ${item.source != null ? "(new)" : ""}`,
-        }));
-        setBanksdata(databank);
-      } catch (err) {
-        if (err.name !== "CanceledError") console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchVendor();
-    return () => controller.abort();
-  }, [id]);
-
-  useEffect(() => {
     if (!vendor?.banks?.length) return;
 
     const controller = new AbortController();
